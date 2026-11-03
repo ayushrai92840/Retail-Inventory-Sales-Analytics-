@@ -1,0 +1,25 @@
+-- Create relationships:
+-- Products[product_id] 1:* Sales[product_id]
+-- Products[product_id] 1:* Inventory[product_id]
+-- Stores[store_id] 1:* Sales[store_id]
+-- Stores[store_id] 1:* Inventory[store_id]
+-- Create a Date table and relate Date[Date] 1:* Sales[order_date].
+-- Mark Date table as the date table.
+
+Total Revenue = SUM(Sales[sales_amount])
+Total Cost = SUM(Sales[cost_amount])
+Gross Profit = [Total Revenue] - [Total Cost]
+Gross Margin % = DIVIDE([Gross Profit], [Total Revenue], 0)
+Units Sold = SUM(Sales[quantity_sold])
+Total Orders = DISTINCTCOUNT(Sales[order_id])
+Average Order Value = DIVIDE([Total Revenue], [Total Orders], 0)
+Inventory Units = SUM(Inventory[stock_quantity])
+Inventory Cost Value =
+    SUMX(Inventory, Inventory[stock_quantity] * RELATED(Products[unit_cost]))
+Low Stock Product-Store Count =
+    COUNTROWS(FILTER(Inventory, Inventory[stock_quantity] <= Inventory[reorder_level]))
+Revenue YTD = TOTALYTD([Total Revenue], 'Date'[Date])
+Revenue Previous Month =
+    CALCULATE([Total Revenue], DATEADD('Date'[Date], -1, MONTH))
+Revenue MoM % =
+    DIVIDE([Total Revenue] - [Revenue Previous Month], [Revenue Previous Month], 0)
